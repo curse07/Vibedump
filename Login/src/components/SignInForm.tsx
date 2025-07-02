@@ -120,7 +120,7 @@ const SignInForm: React.FC = () => {
             <input
               type="text"
               name="username"
-              placeholder="Username"
+              placeholder="Username/ Email"
               value={formData.username}
               onChange={handleInputChange}
               onBlur={handleInputBlur}

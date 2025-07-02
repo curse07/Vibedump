@@ -1,33 +1,55 @@
-import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import React, { useState, useCallback, useRef } from 'react';
+import { Eye, EyeOff, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { validateEmailWithAPI, checkUsernameAvailability, checkEmailRegistration } from '../services/validationService';
 
 interface FormErrors {
+  email?: string;
   username?: string;
   password?: string;
   terms?: string;
+}
+
+interface ValidationStatus {
+  email: 'idle' | 'checking' | 'valid' | 'invalid';
+  username: 'idle' | 'checking' | 'available' | 'taken';
 }
 
 const SignInForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [formData, setFormData] = useState({
+    email: '',
     username: '',
     password: '',
     terms: false
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState({
+    email: false,
     username: false,
     password: false,
     terms: false
   });
   const [submitted, setSubmitted] = useState(false);
+  const [validationStatus, setValidationStatus] = useState<ValidationStatus>({
+    email: 'idle',
+    username: 'idle'
+  });
+  
+  // Refs to store timeouts for debouncing
+  const emailCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const usernameCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const validateField = (name: string, value: string | boolean, isSubmission: boolean = false): string => {
     switch (name) {
+      case 'email':
+        if (isSubmission && !value.toString().trim()) return 'Email is required';
+        if (value.toString().trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.toString())) return 'Please enter a valid email address';
+        return '';
       case 'username':
         if (isSubmission && !value.toString().trim()) return 'Username is required';
         if (value.toString().trim() && value.toString().length < 3) return 'Username must be at least 3 characters';
+        if (value.toString().trim() && !/^[a-zA-Z0-9_-]+$/.test(value.toString())) return 'Username can only contain letters, numbers, hyphens, and underscores';
         return '';
       case 'password':
         if (isSubmission && !value) return 'Password is required';
@@ -40,6 +62,96 @@ const SignInForm: React.FC = () => {
         return '';
     }
   };
+
+  const handleEmailValidation = useCallback(async (email: string) => {
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setValidationStatus(prev => ({ ...prev, email: 'idle' }));
+      return;
+    }
+
+    setValidationStatus(prev => ({ ...prev, email: 'checking' }));
+    
+    try {
+      // First check if email is already registered
+      const isRegistered = await checkEmailRegistration(email);
+      if (isRegistered) {
+        setErrors(prev => ({
+          ...prev,
+          email: 'This email is already registered. Please use a different email or log in.'
+        }));
+        setValidationStatus(prev => ({ ...prev, email: 'invalid' }));
+        return;
+      }
+
+      // Then validate email existence and deliverability
+      const validation = await validateEmailWithAPI(email);
+      
+      if (!validation.isValid || !validation.isDeliverable || validation.isDisposable) {
+        setErrors(prev => ({
+          ...prev,
+          email: validation.message || 'Please enter a valid email address'
+        }));
+        setValidationStatus(prev => ({ ...prev, email: 'invalid' }));
+      } else {
+        // Clear email error if it was about validation
+        setErrors(prev => {
+          const newErrors = { ...prev };
+          if (newErrors.email && (
+            newErrors.email.includes('already registered') ||
+            newErrors.email.includes('valid email') ||
+            newErrors.email.includes('cannot receive') ||
+            newErrors.email.includes('not allowed') ||
+            newErrors.email.includes('does not exist')
+          )) {
+            delete newErrors.email;
+          }
+          return newErrors;
+        });
+        setValidationStatus(prev => ({ ...prev, email: 'valid' }));
+      }
+    } catch (error) {
+      console.error('Error validating email:', error);
+      setValidationStatus(prev => ({ ...prev, email: 'idle' }));
+    }
+  }, []);
+
+  const handleUsernameCheck = useCallback(async (username: string) => {
+    if (!username.trim() || username.length < 3) {
+      setValidationStatus(prev => ({ ...prev, username: 'idle' }));
+      return;
+    }
+
+    setValidationStatus(prev => ({ ...prev, username: 'checking' }));
+    
+    try {
+      const result = await checkUsernameAvailability(username);
+      
+      if (!result.isAvailable) {
+        setErrors(prev => ({
+          ...prev,
+          username: result.message || 'This username is not available'
+        }));
+        setValidationStatus(prev => ({ ...prev, username: 'taken' }));
+      } else {
+        // Clear username error if it was about availability
+        setErrors(prev => {
+          const newErrors = { ...prev };
+          if (newErrors.username && (
+            newErrors.username.includes('already taken') ||
+            newErrors.username.includes('not available') ||
+            newErrors.username.includes('reserved')
+          )) {
+            delete newErrors.username;
+          }
+          return newErrors;
+        });
+        setValidationStatus(prev => ({ ...prev, username: 'available' }));
+      }
+    } catch (error) {
+      console.error('Error checking username:', error);
+      setValidationStatus(prev => ({ ...prev, username: 'idle' }));
+    }
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -56,6 +168,32 @@ const SignInForm: React.FC = () => {
         ...prev,
         [name]: ''
       }));
+    }
+
+    // Handle email validation with debounce
+    if (name === 'email' && type !== 'checkbox') {
+      setValidationStatus(prev => ({ ...prev, email: 'idle' }));
+      
+      if (emailCheckTimeoutRef.current) {
+        clearTimeout(emailCheckTimeoutRef.current);
+      }
+      
+      emailCheckTimeoutRef.current = setTimeout(() => {
+        handleEmailValidation(value);
+      }, 1000);
+    }
+
+    // Handle username checking with debounce
+    if (name === 'username' && type !== 'checkbox') {
+      setValidationStatus(prev => ({ ...prev, username: 'idle' }));
+      
+      if (usernameCheckTimeoutRef.current) {
+        clearTimeout(usernameCheckTimeoutRef.current);
+      }
+      
+      usernameCheckTimeoutRef.current = setTimeout(() => {
+        handleUsernameCheck(value);
+      }, 800);
     }
   };
 
@@ -74,9 +212,25 @@ const SignInForm: React.FC = () => {
       ...prev,
       [name]: error
     }));
+
+    // For email, also check validation on blur if not already checking
+    if (name === 'email' && value.trim() && validationStatus.email !== 'checking') {
+      if (emailCheckTimeoutRef.current) {
+        clearTimeout(emailCheckTimeoutRef.current);
+      }
+      handleEmailValidation(value);
+    }
+
+    // For username, also check availability on blur if not already checking
+    if (name === 'username' && value.trim() && validationStatus.username !== 'checking') {
+      if (usernameCheckTimeoutRef.current) {
+        clearTimeout(usernameCheckTimeoutRef.current);
+      }
+      handleUsernameCheck(value);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
     
@@ -89,16 +243,35 @@ const SignInForm: React.FC = () => {
 
     // Mark all fields as touched
     setTouched({
+      email: true,
       username: true,
       password: true,
       terms: true
     });
+
+    // Final validation checks
+    if (formData.email && !newErrors.email) {
+      if (validationStatus.email === 'invalid') {
+        newErrors.email = 'Please enter a valid email address';
+      } else if (validationStatus.email === 'checking') {
+        newErrors.email = 'Please wait while we verify your email';
+      }
+    }
+
+    if (formData.username && !newErrors.username) {
+      if (validationStatus.username === 'taken') {
+        newErrors.username = 'This username is not available';
+      } else if (validationStatus.username === 'checking') {
+        newErrors.username = 'Please wait while we check username availability';
+      }
+    }
 
     setErrors(newErrors);
 
     // If no errors, proceed with submission
     if (Object.keys(newErrors).length === 0) {
       console.log('Sign up attempt:', formData);
+      alert('Account created successfully!');
     }
   };
 
@@ -116,11 +289,38 @@ const SignInForm: React.FC = () => {
 
   const getInputClassName = (fieldName: keyof FormErrors) => {
     const hasError = (touched[fieldName] || submitted) && errors[fieldName];
+    const isValidating = (fieldName === 'email' && validationStatus.email === 'checking') || 
+                        (fieldName === 'username' && validationStatus.username === 'checking');
+    const isValid = (fieldName === 'email' && validationStatus.email === 'valid') || 
+                   (fieldName === 'username' && validationStatus.username === 'available');
+    
     return `w-full px-3 py-2.5 text-sm bg-white border rounded-md text-gray-700 placeholder-gray-500 focus:outline-none transition-all duration-200 ${
       hasError 
         ? 'border-red-500 focus:ring-1 focus:ring-red-500 focus:border-red-500' 
+        : isValid
+        ? 'border-green-500 focus:ring-1 focus:ring-green-500 focus:border-green-500'
         : 'border-gray-300 focus:ring-1 focus:ring-gray-400 focus:border-transparent'
     }`;
+  };
+
+  const getValidationIcon = (fieldName: 'email' | 'username') => {
+    const status = validationStatus[fieldName];
+    const hasValue = formData[fieldName].trim().length > 0;
+    
+    if (!hasValue) return null;
+    
+    switch (status) {
+      case 'checking':
+        return <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />;
+      case 'valid':
+      case 'available':
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'invalid':
+      case 'taken':
+        return <XCircle className="w-4 h-4 text-red-500" />;
+      default:
+        return null;
+    }
   };
 
   if (showTerms) {
@@ -192,19 +392,53 @@ const SignInForm: React.FC = () => {
       {/* Form container with original positioning */}
       <div className="w-full max-w-xs">
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Email Field */}
+          <div>
+            <div className="relative">
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                className={`${getInputClassName('email')} ${formData.email.trim() ? 'pr-10' : ''}`}
+                aria-invalid={(touched.email || submitted) && !!errors.email}
+                aria-describedby={errors.email ? 'email-error' : undefined}
+              />
+              {formData.email.trim() && (
+                <div className="absolute right-2.5 top-1/2 transform -translate-y-1/2">
+                  {getValidationIcon('email')}
+                </div>
+              )}
+            </div>
+            {(touched.email || submitted) && errors.email && (
+              <p id="email-error" className="mt-1 text-xs text-red-600" role="alert">
+                {errors.email}
+              </p>
+            )}
+          </div>
+
           {/* Username Field */}
           <div>
-            <input
-              type="text"
-              name="username"
-              placeholder="Username"
-              value={formData.username}
-              onChange={handleInputChange}
-              onBlur={handleInputBlur}
-              className={getInputClassName('username')}
-              aria-invalid={(touched.username || submitted) && !!errors.username}
-              aria-describedby={errors.username ? 'username-error' : undefined}
-            />
+            <div className="relative">
+              <input
+                type="text"
+                name="username"
+                placeholder="Username"
+                value={formData.username}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                className={`${getInputClassName('username')} ${formData.username.trim() ? 'pr-10' : ''}`}
+                aria-invalid={(touched.username || submitted) && !!errors.username}
+                aria-describedby={errors.username ? 'username-error' : undefined}
+              />
+              {formData.username.trim() && (
+                <div className="absolute right-2.5 top-1/2 transform -translate-y-1/2">
+                  {getValidationIcon('username')}
+                </div>
+              )}
+            </div>
             {(touched.username || submitted) && errors.username && (
               <p id="username-error" className="mt-1 text-xs text-red-600" role="alert">
                 {errors.username}
@@ -285,9 +519,10 @@ const SignInForm: React.FC = () => {
           {/* Sign Up Button */}
           <button
             type="submit"
-            className="w-full bg-black text-white py-2.5 text-sm rounded-md font-medium transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1"
+            disabled={validationStatus.email === 'checking' || validationStatus.username === 'checking'}
+            className="w-full bg-black text-white py-2.5 text-sm rounded-md font-medium transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign up
+            {(validationStatus.email === 'checking' || validationStatus.username === 'checking') ? 'Validating...' : 'Sign up'}
           </button>
 
           {/* Divider */}

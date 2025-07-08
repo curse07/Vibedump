@@ -225,7 +225,7 @@ const Index = () => {
                 <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">#emotional expression</span>
                 <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">#research</span>
               </div>
-              <Button variant="outline" className="text-orange-600 border-orange-300 hover:bg-orange-50">
+              <Button variant="outline" className="w-full text-orange-600 border-orange-300 hover:bg-orange-50">
                 Read More
               </Button>
             </CardContent>

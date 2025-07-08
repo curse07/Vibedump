@@ -1,6 +1,8 @@
+import React, { useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
+import { PremiumModal } from "../../components/PremiumModal";
 
 // Sample suggestion data for mapping
 const suggestions = [
@@ -10,7 +12,18 @@ const suggestions = [
 ];
 
 export const ChatBotUi = (): JSX.Element => {
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+
+  const handleMicrophoneClick = () => {
+    setShowPremiumModal(true);
+  };
+
+  const handleClosePremiumModal = () => {
+    setShowPremiumModal(false);
+  };
+
   return (
+    <>
     <div className="bg-white flex flex-row justify-center w-screen h-screen overflow-auto">
       <div className="bg-white overflow-hidden w-full h-full relative">
         {/* Gradient background effects */}
@@ -54,9 +67,19 @@ export const ChatBotUi = (): JSX.Element => {
              !border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none !focus:border-none !focus:shadow-none"
               placeholder="How are you feeling today ?"
             />
-            <Button variant="ghost" size="icon" className="p-0">
-            <img src="./send.png" alt="Send" className="w-6 h-6" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="p-0 hover:bg-transparent"
+                onClick={handleMicrophoneClick}
+              >
+                <img src="./microphone-black-shape.png" alt="Microphone" className="w-6 h-6" />
+              </Button>
+              <Button variant="ghost" size="icon" className="p-0 hover:bg-transparent">
+                <img src="./send.png" alt="Send" className="w-6 h-6" />
+              </Button>
+            </div>
           </Card>
         </div>
 
@@ -73,5 +96,11 @@ export const ChatBotUi = (): JSX.Element => {
         </div>
       </div>
     </div>
+
+    <PremiumModal
+      isOpen={showPremiumModal}
+      onClose={handleClosePremiumModal}
+    />
+    </>
   );
 };

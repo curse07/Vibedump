@@ -183,12 +183,10 @@ export const PaymentPage: React.FC = () => {
   };
 
   const renderPaymentMethods = () => (
-    <div className="w-80 bg-white rounded-lg border border-[#dce0e5]">
-      <h2 className="text-[#111418] text-[22px] font-bold leading-tight tracking-[-0.015em] px-6 py-4 border-b border-[#dce0e5]">
-        Payment methods
-      </h2>
+    <div className="w-full max-w-sm">
+      <h2 className="text-gray-900 text-xl font-semibold mb-6">Payment methods</h2>
       
-      <div className="p-2">
+      <div className="space-y-3 mb-8">
         {paymentMethods.map((method) => {
           const IconComponent = method.icon;
           const isSelected = selectedMethod === method.id;
@@ -197,20 +195,20 @@ export const PaymentPage: React.FC = () => {
             <button
               key={method.id}
               onClick={() => handleMethodSelect(method.id)}
-              className={`w-full flex items-center gap-4 p-4 rounded-lg transition-all ${
+              className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
                 isSelected 
-                  ? 'bg-[#f0f8ff] border border-[#1978e5]' 
-                  : 'hover:bg-[#f8f9fa]'
+                  ? 'border-blue-500 bg-blue-50' 
+                  : 'border-gray-200 hover:border-gray-300 bg-white'
               }`}
             >
-              <div className={`flex items-center justify-center rounded-lg shrink-0 size-10 ${
-                isSelected ? 'bg-[#1978e5] text-white' : 'bg-[#f0f2f4] text-[#111418]'
+              <div className={`flex items-center justify-center rounded-lg shrink-0 w-10 h-10 ${
+                isSelected ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'
               }`}>
                 <IconComponent size={20} />
               </div>
               <div className="text-left flex-1">
-                <p className="text-[#111418] font-medium">{method.name}</p>
-                <p className="text-[#637488] text-sm">{method.description}</p>
+                <p className="text-gray-900 font-medium">{method.name}</p>
+                <p className="text-gray-500 text-sm">{method.description}</p>
               </div>
             </button>
           );
@@ -218,37 +216,37 @@ export const PaymentPage: React.FC = () => {
       </div>
 
       {/* Billing Summary */}
-      <div className="border-t border-[#dce0e5] p-6">
-        <h3 className="text-[#111418] text-lg font-bold mb-4">Order Summary</h3>
+      <div className="bg-gray-50 rounded-xl p-6">
+        <h3 className="text-gray-900 text-lg font-semibold mb-4">Order Summary</h3>
         
         <div className="space-y-3 mb-4">
           <div className="flex justify-between">
-            <span className="text-[#637488] text-sm">{billingInfo.item}</span>
-            <span className="text-[#111418] font-medium">${billingInfo.amount}</span>
+            <span className="text-gray-600 text-sm">{billingInfo.item}</span>
+            <span className="text-gray-900 font-medium">${billingInfo.amount}</span>
           </div>
-          <div className="text-[#637488] text-xs">{billingInfo.description}</div>
+          <div className="text-gray-500 text-xs">{billingInfo.description}</div>
           
           {billingInfo.tax > 0 && (
             <div className="flex justify-between">
-              <span className="text-[#637488] text-sm">Tax</span>
-              <span className="text-[#111418] font-medium">${billingInfo.tax}</span>
+              <span className="text-gray-600 text-sm">Tax</span>
+              <span className="text-gray-900 font-medium">${billingInfo.tax}</span>
             </div>
           )}
         </div>
         
-        <div className="border-t border-[#dce0e5] pt-3">
+        <div className="border-t border-gray-200 pt-3">
           <div className="flex justify-between">
-            <span className="text-[#111418] font-bold">Total</span>
-            <span className="text-[#111418] font-bold text-lg">${billingInfo.total}</span>
+            <span className="text-gray-900 font-semibold">Total</span>
+            <span className="text-gray-900 font-semibold text-lg">${billingInfo.total}</span>
           </div>
         </div>
 
-        <div className="mt-4 p-3 bg-[#f0f8ff] rounded-lg">
+        <div className="mt-4 p-3 bg-blue-50 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
-            <Shield size={16} className="text-[#1978e5]" />
-            <span className="text-[#111418] font-medium text-sm">What's included:</span>
+            <Shield size={16} className="text-blue-600" />
+            <span className="text-gray-900 font-medium text-sm">What's included:</span>
           </div>
-          <ul className="text-[#637488] text-xs space-y-1">
+          <ul className="text-gray-600 text-xs space-y-1">
             <li>• Voice input support</li>
             <li>• Advanced AI responses</li>
             <li>• Priority support</li>
@@ -260,33 +258,49 @@ export const PaymentPage: React.FC = () => {
   );
 
   const renderUpiDetails = () => (
-    <div className="flex-1 bg-white rounded-lg border border-[#dce0e5] p-6">
-      <h2 className="text-[#111418] text-2xl font-bold mb-6">Pay with UPI</h2>
+    <div className="w-full max-w-2xl">
+      <h2 className="text-gray-900 text-2xl font-semibold mb-6">Pay with UPI</h2>
       
       <div className="mb-6">
-        <label className="block text-[#111418] font-medium mb-2">Enter UPI ID</label>
+        <label className="block text-gray-700 font-medium mb-3">Enter UPI ID</label>
         <input
           type="text"
           placeholder="yourname@upi (e.g., john@paytm)"
           value={paymentData.upiId || ''}
           onChange={(e) => handleInputChange('upiId', e.target.value)}
-          className={`w-full h-14 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1978e5] text-base ${
-            errors.upiId ? 'border-red-500' : 'border-[#dce0e5]'
+          className={`w-full h-12 px-4 border-2 rounded-xl focus:outline-none focus:border-blue-500 text-base bg-white ${
+            errors.upiId ? 'border-red-500' : 'border-gray-200'
           }`}
         />
-        {errors.upiId && <p className="text-red-500 text-sm mt-1">{errors.upiId}</p>}
+        {errors.upiId && <p className="text-red-500 text-sm mt-2">{errors.upiId}</p>}
       </div>
 
       <div className="mb-6">
-        <p className="text-[#637488] text-sm mb-3">Or pay using UPI apps:</p>
+        <p className="text-gray-600 text-sm mb-3">Or pay using UPI apps:</p>
         <div className="flex gap-3">
-          {['Google Pay', 'PhonePe', 'Paytm'].map((app) => (
+          {[
+            { name: 'Google Pay', logo: '/gpay.png' },
+            { name: 'PhonePe', logo: '/phonepe.png' },
+            { name: 'Paytm', logo: '/paytm.png' }
+          ].map((app) => (
             <button
-              key={app}
-              className="flex-1 p-3 border border-[#dce0e5] rounded-lg hover:border-[#1978e5] transition-colors"
+              key={app.name}
+              className="flex-1 p-4 border-2 border-gray-200 rounded-xl hover:border-blue-500 transition-all duration-200 bg-white hover:shadow-lg"
             >
-              <div className="w-8 h-8 bg-[#f0f2f4] rounded mx-auto mb-2"></div>
-              <p className="text-[#111418] text-xs font-medium">{app}</p>
+              <div className="w-12 h-12 mx-auto mb-3 rounded-lg flex items-center justify-center bg-white border border-gray-100">
+                {app.logo ? (
+                  <img 
+                    src={app.logo} 
+                    alt={`${app.name} logo`}
+                    className="w-10 h-10 object-contain"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">P</span>
+                  </div>
+                )}
+              </div>
+              <p className="text-gray-900 text-sm font-medium">{app.name}</p>
             </button>
           ))}
         </div>
@@ -295,7 +309,7 @@ export const PaymentPage: React.FC = () => {
       <button
         onClick={handlePayment}
         disabled={!paymentData.upiId?.trim()}
-        className="w-full h-12 bg-[#1978e5] text-white font-bold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1565c0] transition-colors"
+        className="w-full h-12 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors"
       >
         Pay ${billingInfo.total}
       </button>
@@ -303,14 +317,14 @@ export const PaymentPage: React.FC = () => {
   );
 
   const renderCardDetails = () => (
-    <div className="flex-1 bg-white rounded-lg border border-[#dce0e5] p-6">
-      <h2 className="text-[#111418] text-2xl font-bold mb-6">
+    <div className="w-full max-w-2xl">
+      <h2 className="text-gray-900 text-2xl font-semibold mb-6">
         {selectedMethod === 'credit' ? 'Credit Card' : 'Debit Card'} Details
       </h2>
       
       <div className="space-y-4 mb-6">
         <div>
-          <label className="block text-[#111418] font-medium mb-2">Card Number</label>
+          <label className="block text-gray-700 font-medium mb-3">Card Number</label>
           <div className="relative">
             <input
               type="text"
@@ -318,22 +332,22 @@ export const PaymentPage: React.FC = () => {
               value={paymentData.cardNumber || ''}
               onChange={(e) => handleInputChange('cardNumber', formatCardNumber(e.target.value))}
               maxLength={19}
-              className={`w-full h-14 px-4 pr-16 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1978e5] text-base ${
-                errors.cardNumber ? 'border-red-500' : 'border-[#dce0e5]'
+              className={`w-full h-12 px-4 pr-16 border-2 rounded-xl focus:outline-none focus:border-blue-500 text-base bg-white ${
+                errors.cardNumber ? 'border-red-500' : 'border-gray-200'
               }`}
             />
             {paymentData.cardNumber && (
-              <div className="absolute right-3 top-4 text-[#637488] text-sm font-medium">
+              <div className="absolute right-3 top-3 text-gray-500 text-sm font-medium">
                 {getCardType(paymentData.cardNumber)}
               </div>
             )}
           </div>
-          {errors.cardNumber && <p className="text-red-500 text-sm mt-1">{errors.cardNumber}</p>}
+          {errors.cardNumber && <p className="text-red-500 text-sm mt-2">{errors.cardNumber}</p>}
         </div>
         
         <div className="flex gap-4">
           <div className="flex-1">
-            <label className="block text-[#111418] font-medium mb-2">Expiry Date</label>
+            <label className="block text-gray-700 font-medium mb-3">Expiry Date</label>
             <input
               type="text"
               placeholder="MM/YY"
@@ -346,70 +360,70 @@ export const PaymentPage: React.FC = () => {
                 handleInputChange('expiryDate', value);
               }}
               maxLength={5}
-              className={`w-full h-14 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1978e5] text-base ${
-                errors.expiryDate ? 'border-red-500' : 'border-[#dce0e5]'
+              className={`w-full h-12 px-4 border-2 rounded-xl focus:outline-none focus:border-blue-500 text-base bg-white ${
+                errors.expiryDate ? 'border-red-500' : 'border-gray-200'
               }`}
             />
-            {errors.expiryDate && <p className="text-red-500 text-sm mt-1">{errors.expiryDate}</p>}
+            {errors.expiryDate && <p className="text-red-500 text-sm mt-2">{errors.expiryDate}</p>}
           </div>
           
           <div className="flex-1">
-            <label className="block text-[#111418] font-medium mb-2">CVV</label>
+            <label className="block text-gray-700 font-medium mb-3">CVV</label>
             <input
               type="password"
               placeholder="123"
               value={paymentData.cvv || ''}
               onChange={(e) => handleInputChange('cvv', e.target.value.replace(/\D/g, ''))}
               maxLength={4}
-              className={`w-full h-14 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1978e5] text-base ${
-                errors.cvv ? 'border-red-500' : 'border-[#dce0e5]'
+              className={`w-full h-12 px-4 border-2 rounded-xl focus:outline-none focus:border-blue-500 text-base bg-white ${
+                errors.cvv ? 'border-red-500' : 'border-gray-200'
               }`}
             />
-            {errors.cvv && <p className="text-red-500 text-sm mt-1">{errors.cvv}</p>}
+            {errors.cvv && <p className="text-red-500 text-sm mt-2">{errors.cvv}</p>}
           </div>
         </div>
         
         <div>
-          <label className="block text-[#111418] font-medium mb-2">Cardholder Name</label>
+          <label className="block text-gray-700 font-medium mb-3">Cardholder Name</label>
           <input
             type="text"
             placeholder="John Doe"
             value={paymentData.cardholderName || ''}
             onChange={(e) => handleInputChange('cardholderName', e.target.value)}
-            className={`w-full h-14 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1978e5] text-base ${
-              errors.cardholderName ? 'border-red-500' : 'border-[#dce0e5]'
+            className={`w-full h-12 px-4 border-2 rounded-xl focus:outline-none focus:border-blue-500 text-base bg-white ${
+              errors.cardholderName ? 'border-red-500' : 'border-gray-200'
             }`}
           />
-          {errors.cardholderName && <p className="text-red-500 text-sm mt-1">{errors.cardholderName}</p>}
+          {errors.cardholderName && <p className="text-red-500 text-sm mt-2">{errors.cardholderName}</p>}
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <input
             type="checkbox"
             id="saveCard"
             checked={paymentData.saveCard || false}
             onChange={(e) => handleInputChange('saveCard', e.target.checked.toString())}
-            className="w-4 h-4 text-[#1978e5] border-[#dce0e5] rounded focus:ring-[#1978e5]"
+            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
           />
-          <label htmlFor="saveCard" className="text-[#637488] text-sm">
+          <label htmlFor="saveCard" className="text-gray-600 text-sm">
             Save this card for future payments
           </label>
         </div>
       </div>
 
-      <div className="mb-6 p-4 bg-[#f0f8ff] rounded-lg">
+      <div className="mb-6 p-4 bg-blue-50 rounded-xl">
         <div className="flex items-center gap-2 mb-2">
-          <Shield size={16} className="text-[#1978e5]" />
-          <span className="text-[#111418] font-medium text-sm">Secure Payment</span>
+          <Shield size={16} className="text-blue-600" />
+          <span className="text-gray-900 font-medium text-sm">Secure Payment</span>
         </div>
-        <p className="text-[#637488] text-xs">
+        <p className="text-gray-600 text-xs">
           Your card information is encrypted and secure. We use industry-standard SSL encryption.
         </p>
       </div>
       
       <button
         onClick={handlePayment}
-        className="w-full h-12 bg-[#1978e5] text-white font-bold rounded-lg hover:bg-[#1565c0] transition-colors"
+        className="w-full h-12 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors"
       >
         Pay ${billingInfo.total}
       </button>
@@ -417,16 +431,16 @@ export const PaymentPage: React.FC = () => {
   );
 
   const renderNetBankingDetails = () => (
-    <div className="flex-1 bg-white rounded-lg border border-[#dce0e5] p-6">
-      <h2 className="text-[#111418] text-2xl font-bold mb-6">Net Banking</h2>
+    <div className="w-full max-w-2xl">
+      <h2 className="text-gray-900 text-2xl font-semibold mb-6">Net Banking</h2>
       
       <div className="mb-6">
-        <label className="block text-[#111418] font-medium mb-2">Select Your Bank</label>
+        <label className="block text-gray-700 font-medium mb-3">Select Your Bank</label>
         <select
           value={paymentData.bankName || ''}
           onChange={(e) => handleInputChange('bankName', e.target.value)}
-          className={`w-full h-14 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1978e5] text-base ${
-            errors.bankName ? 'border-red-500' : 'border-[#dce0e5]'
+          className={`w-full h-12 px-4 border-2 rounded-xl focus:outline-none focus:border-blue-500 text-base bg-white ${
+            errors.bankName ? 'border-red-500' : 'border-gray-200'
           }`}
         >
           <option value="">Choose your bank</option>
@@ -434,16 +448,16 @@ export const PaymentPage: React.FC = () => {
             <option key={bank} value={bank}>{bank}</option>
           ))}
         </select>
-        {errors.bankName && <p className="text-red-500 text-sm mt-1">{errors.bankName}</p>}
+        {errors.bankName && <p className="text-red-500 text-sm mt-2">{errors.bankName}</p>}
       </div>
 
       {paymentData.bankName && (
-        <div className="mb-6 p-4 bg-[#fff3cd] border border-[#ffeaa7] rounded-lg">
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
           <div className="flex items-center gap-2 mb-2">
-            <AlertCircle size={16} className="text-[#856404]" />
-            <span className="text-[#856404] font-medium text-sm">Important</span>
+            <AlertCircle size={16} className="text-yellow-600" />
+            <span className="text-yellow-800 font-medium text-sm">Important</span>
           </div>
-          <p className="text-[#856404] text-xs">
+          <p className="text-yellow-700 text-xs">
             You will be redirected to {paymentData.bankName}'s secure login page to complete the payment.
           </p>
         </div>
@@ -451,8 +465,7 @@ export const PaymentPage: React.FC = () => {
       
       <button
         onClick={handlePayment}
-        disabled={!paymentData.bankName}
-        className="w-full h-12 bg-[#1978e5] text-white font-bold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1565c0] transition-colors"
+        className="w-full h-12 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors"
       >
         Proceed to {paymentData.bankName || 'Bank'}
       </button>
@@ -462,22 +475,22 @@ export const PaymentPage: React.FC = () => {
   const renderProcessing = () => (
     <div className="flex-1 flex items-center justify-center min-h-[400px]">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1978e5] mx-auto mb-6"></div>
-        <h2 className="text-[#111418] text-2xl font-bold mb-2">Processing Payment...</h2>
-        <p className="text-[#637488]">Please wait while we process your payment securely</p>
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-6"></div>
+        <h2 className="text-gray-900 text-2xl font-semibold mb-2">Processing Payment...</h2>
+        <p className="text-gray-600">Please wait while we process your payment securely</p>
         {selectedMethod === 'netbanking' && (
-          <p className="text-[#637488] text-sm mt-2">You may be redirected to your bank's website</p>
+          <p className="text-gray-600 text-sm mt-2">You may be redirected to your bank's website</p>
         )}
       </div>
     </div>
   );
 
   const renderOtpVerification = () => (
-    <div className="flex-1 bg-white rounded-lg border border-[#dce0e5] p-6">
-      <h2 className="text-[#111418] text-2xl font-bold mb-6">Enter OTP</h2>
+    <div className="w-full max-w-2xl">
+      <h2 className="text-gray-900 text-2xl font-semibold mb-6">Enter OTP</h2>
       
       <div className="mb-6">
-        <p className="text-[#637488] mb-4">
+        <p className="text-gray-600 mb-4">
           Enter the 6-digit OTP sent to your registered mobile number ending with ****1234
         </p>
         
@@ -487,15 +500,15 @@ export const PaymentPage: React.FC = () => {
           value={paymentData.otp || ''}
           onChange={(e) => handleInputChange('otp', e.target.value.replace(/\D/g, ''))}
           maxLength={6}
-          className={`w-full h-14 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1978e5] text-center text-lg tracking-widest ${
-            errors.otp ? 'border-red-500' : 'border-[#dce0e5]'
+          className={`w-full h-12 px-4 border-2 rounded-xl focus:outline-none focus:border-blue-500 text-center text-lg tracking-widest bg-white ${
+            errors.otp ? 'border-red-500' : 'border-gray-200'
           }`}
         />
-        {errors.otp && <p className="text-red-500 text-sm mt-1">{errors.otp}</p>}
+        {errors.otp && <p className="text-red-500 text-sm mt-2">{errors.otp}</p>}
       </div>
 
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2 text-[#637488] text-sm">
+        <div className="flex items-center gap-2 text-gray-600 text-sm">
           <Clock size={16} />
           <span>Resend OTP in {otpTimer}s</span>
         </div>
@@ -505,7 +518,7 @@ export const PaymentPage: React.FC = () => {
               setOtpTimer(30);
               startOtpTimer();
             }}
-            className="text-[#1978e5] text-sm font-medium hover:underline"
+            className="text-blue-600 text-sm font-medium hover:underline"
           >
             Resend OTP
           </button>
@@ -515,7 +528,7 @@ export const PaymentPage: React.FC = () => {
       <button
         onClick={handleOtpVerification}
         disabled={!paymentData.otp || paymentData.otp.length !== 6}
-        className="w-full h-12 bg-[#1978e5] text-white font-bold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1565c0] transition-colors"
+        className="w-full h-12 bg-black text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-800 transition-colors"
       >
         Verify & Pay ${billingInfo.total}
       </button>
@@ -526,30 +539,30 @@ export const PaymentPage: React.FC = () => {
     <div className="flex-1 flex items-center justify-center min-h-[500px]">
       <div className="text-center max-w-md">
         <div className="mb-6">
-          <div className="w-20 h-20 bg-[#1978e5] rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle size={40} className="text-white" />
           </div>
-          <h2 className="text-[#111418] text-3xl font-bold mb-2">Payment Successful!</h2>
-          <p className="text-[#637488] mb-6">Your premium subscription has been activated</p>
+          <h2 className="text-gray-900 text-3xl font-semibold mb-2">Payment Successful!</h2>
+          <p className="text-gray-600 mb-6">Your premium subscription has been activated</p>
         </div>
         
-        <div className="bg-[#f8f9fa] rounded-lg p-6 mb-6 text-left">
+        <div className="bg-gray-50 rounded-xl p-6 mb-6 text-left">
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-[#637488]">Transaction ID:</span>
-              <span className="text-[#111418] font-mono">{transactionId}</span>
+              <span className="text-gray-600">Transaction ID:</span>
+              <span className="text-gray-900 font-mono">{transactionId}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[#637488]">Date & Time:</span>
-              <span className="text-[#111418]">{new Date().toLocaleString()}</span>
+              <span className="text-gray-600">Date & Time:</span>
+              <span className="text-gray-900">{new Date().toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[#637488]">Amount:</span>
-              <span className="text-[#111418] font-bold">${billingInfo.total}</span>
+              <span className="text-gray-600">Amount:</span>
+              <span className="text-gray-900 font-semibold">${billingInfo.total}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[#637488]">Payment Method:</span>
-              <span className="text-[#111418] capitalize">{selectedMethod}</span>
+              <span className="text-gray-600">Payment Method:</span>
+              <span className="text-gray-900 capitalize">{selectedMethod}</span>
             </div>
           </div>
         </div>
@@ -557,7 +570,7 @@ export const PaymentPage: React.FC = () => {
         <div className="space-y-3">
           <button
             onClick={() => {/* Download receipt logic */}}
-            className="w-full flex items-center justify-center gap-2 h-12 border border-[#dce0e5] text-[#111418] font-medium rounded-lg hover:bg-[#f8f9fa] transition-colors"
+            className="w-full flex items-center justify-center gap-2 h-12 border-2 border-gray-200 text-gray-900 font-medium rounded-xl hover:bg-gray-50 transition-colors bg-white"
           >
             <Download size={16} />
             Download Receipt
@@ -565,7 +578,7 @@ export const PaymentPage: React.FC = () => {
           
           <button
             onClick={() => navigate('/')}
-            className="w-full flex items-center justify-center gap-2 h-12 bg-[#1978e5] text-white font-bold rounded-lg hover:bg-[#1565c0] transition-colors"
+            className="w-full flex items-center justify-center gap-2 h-12 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors"
           >
             <Home size={16} />
             Continue to App
@@ -582,11 +595,11 @@ export const PaymentPage: React.FC = () => {
           <div className="w-20 h-20 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
             <X size={40} className="text-white" />
           </div>
-          <h2 className="text-[#111418] text-3xl font-bold mb-2">Payment Failed</h2>
-          <p className="text-[#637488] mb-6">We couldn't process your payment. Please try again.</p>
+          <h2 className="text-gray-900 text-3xl font-semibold mb-2">Payment Failed</h2>
+          <p className="text-gray-600 mb-6">We couldn't process your payment. Please try again.</p>
         </div>
         
-        <div className="bg-[#fff5f5] border border-red-200 rounded-lg p-4 mb-6">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
           <p className="text-red-600 text-sm">
             Transaction failed due to insufficient funds or network error. Please check your payment details and try again.
           </p>
@@ -599,14 +612,14 @@ export const PaymentPage: React.FC = () => {
               setPaymentData({ method: selectedMethod });
               setErrors({});
             }}
-            className="w-full h-12 bg-[#1978e5] text-white font-bold rounded-lg hover:bg-[#1565c0] transition-colors"
+            className="w-full h-12 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors"
           >
             Try Again
           </button>
           
           <button
             onClick={() => navigate('/')}
-            className="w-full h-12 border border-[#dce0e5] text-[#111418] font-medium rounded-lg hover:bg-[#f8f9fa] transition-colors"
+            className="w-full h-12 border-2 border-gray-200 text-gray-900 font-medium rounded-xl hover:bg-gray-50 transition-colors bg-white"
           >
             Back to Home
           </button>
@@ -635,17 +648,17 @@ export const PaymentPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa]" style={{fontFamily: 'Inter, "Noto Sans", sans-serif'}}>
-      <header className="bg-white border-b border-[#dce0e5] px-6 py-4">
+    <div className="min-h-screen bg-gray-50" style={{fontFamily: 'Inter, "Noto Sans", sans-serif'}}>
+      <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <h1 className="text-[#111418] text-xl font-bold">
+          <h1 className="text-gray-900 text-xl font-semibold">
             {currentStep === 'success' ? 'Payment Complete' : 'Secure Payment'}
           </h1>
           
           {currentStep !== 'processing' && currentStep !== 'success' && (
             <button
               onClick={() => navigate('/')}
-              className="text-[#637488] hover:text-[#111418] transition-colors"
+              className="text-gray-500 hover:text-gray-700 transition-colors"
             >
               <X size={24} />
             </button>
@@ -653,8 +666,8 @@ export const PaymentPage: React.FC = () => {
         </div>
       </header>
       
-      <main className="max-w-6xl mx-auto px-6 py-8">
-        <div className="flex gap-6">
+      <main className="max-w-6xl mx-auto px-6 py-12">
+        <div className="flex gap-20 items-start justify-center">
           {(currentStep === 'method' || currentStep === 'processing') && renderPaymentMethods()}
           {renderRightPanel()}
         </div>

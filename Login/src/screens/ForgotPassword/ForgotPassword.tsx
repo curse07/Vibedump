@@ -172,7 +172,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBackToSignIn }
     try {
       const emailExists = await checkEmailExists(formData.email);
       if (!emailExists) {
-        setErrors(prev => ({ ...prev, email: 'Email address not found in our records' }));
+        setErrors(prev => ({ ...prev, email: 'Email address not found' }));
         return;
       }
 

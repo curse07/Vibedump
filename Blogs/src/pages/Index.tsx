@@ -2,6 +2,9 @@ import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { articles } from "@/data/articlesData";
+
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -89,8 +92,8 @@ const Index = () => {
                   <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">#stress management</span>
                   <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">#coping skills</span>
                 </div>
-                <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
-                  Read Article
+                <Button asChild className="w-full bg-green-600 hover:bg-green-700 text-white">
+                <Link to={`/articles/1`}>Read Article</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -119,9 +122,10 @@ const Index = () => {
                   <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">#support</span>
                   <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">#recovery</span>
                 </div>
-                <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
-                  Read Article
+                <Button asChild className="w-full bg-green-600 hover:bg-green-700 text-white">
+                <Link to={`/articles/2`}>Read Article</Link>
                 </Button>
+
               </CardContent>
             </Card>
           </div>
@@ -152,8 +156,8 @@ const Index = () => {
                   <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">#mindfulness</span>
                   <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">#emotional regulation</span>
                 </div>
-                <Button variant="outline" className="w-full text-blue-600 border-blue-300 hover:bg-blue-50">
-                  Read More
+                <Button asChild variant="outline" className="w-full text-blue-600 border-blue-300 hover:bg-blue-50">
+                <Link to={`/articles/3`}>Read More</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -176,9 +180,10 @@ const Index = () => {
                   <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">#depression</span>
                   <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">#healing</span>
                 </div>
-                <Button variant="outline" className="w-full text-purple-600 border-purple-300 hover:bg-purple-50">
-                  Read More
+                <Button asChild variant="outline" className="w-full text-blue-600 border-blue-300 hover:bg-blue-50">
+                <Link to={`/articles/4`}>Read More</Link>
                 </Button>
+
               </CardContent>
             </Card>
 
@@ -200,8 +205,8 @@ const Index = () => {
                   <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">#boundaries</span>
                   <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">#relationships</span>
                 </div>
-                <Button variant="outline" className="w-full text-pink-600 border-pink-300 hover:bg-pink-50">
-                  Read More
+                <Button asChild variant="outline" className="w-full text-blue-600 border-blue-300 hover:bg-blue-50">
+                <Link to={`/articles/5`}>Read More</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -225,9 +230,10 @@ const Index = () => {
                 <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">#emotional expression</span>
                 <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">#research</span>
               </div>
-              <Button variant="outline" className="w-full text-orange-600 border-orange-300 hover:bg-orange-50">
-                Read More
+              <Button asChild variant="outline" className="w-full text-blue-600 border-blue-300 hover:bg-blue-50">
+              <Link to={`/articles/6`}>Read More</Link>
               </Button>
+
             </CardContent>
           </Card>
         </div>
